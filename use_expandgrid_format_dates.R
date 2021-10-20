@@ -2,7 +2,7 @@
 # Author: Marty Masek
 # Date Created: August 10, 2021
 # Purpose: We have facility-reported data that are missing reports for some days
-# and have multiple reports for other days When a facility doesn't report, they 
+# and have multiple reports for other days. When a facility doesn't report, they 
 # don't have a row for that day, so we need to give them a row for each possible
 # day and fill their values with previously reported values for up to four days.
 # When they have multiple reports for a day, we need to take the most recent.
