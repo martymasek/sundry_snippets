@@ -1,0 +1,315 @@
+---
+title: "COVID Hospitalization Forecast Demonstration: Automatic ARIMA for Many Geographies"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+author: Marty Masek
+date: August 19, 2020
+---
+
+This is a brief overview of how one may do the hospitalization forecast using ARIMA models. 
+Note that automatic models need to be checked before publishing!
+
+This document provides R code and output without having to install R yourself. 
+It combines R code in grey chunks with output printed in the white chunks.
+
+### Prepare
+Load the tools.
+```{r message=FALSE,warning=FALSE}
+library(tidyverse) # basic set of tools
+library(lubridate) # for working with date/time data
+library(forecast)  # obvious
+library(ggfortify) # turns forecast object into data frame
+library(modelr)    # for running many simultaneous models
+library(ggrepel)   # helps position labels
+library(RODBC)     # data connection to SQL Server
+
+
+options(scipen = 999) # turn off scientific notation
+```
+
+Load the data. (Suppressed for post to GitHub. Was published publicly by FL AHCA's HQA.)
+
+
+```{r, include=FALSE}
+# Make an object to record the start date.
+# If you want to change it later, you only have to change it in this one place.
+start_date <- as.Date("2020-06-05")
+
+# Read in the updated data
+county_data <- place_holder %>%
+  # standardize strange capitalization
+  mutate(date   = as.Date(as.character(date))) %>%
+  # keep only the primary updates and valid data
+  filter(date >= start_date)
+
+# Aggregate statewide data
+statewide <- county_data %>%
+  group_by(date) %>%
+  summarize(cases = sum(cases),
+            hosp  = sum(hosp)) %>%
+  mutate(county = "STATEWIDE")
+
+# Combine county and statewide
+data <- bind_rows(county_data, statewide)
+
+```
+
+### Model
+First, create a ts() object (AKA time series object) called fl_ts. 
+We'll use statewide hospitalizations.
+```{r}
+
+fl_ts <- ts(filter(data, county == "STATEWIDE")$hosp) 
+
+fl_ts # this prints the data in the object.
+```
+
+Second, auto-fit an ARIMA model to the data. 
+This creates a new object called fl_model, which will get all the info from the model.
+```{r}
+
+fl_model <- forecast::auto.arima(fl_ts)
+```
+
+If you want, you can see the models that were tried before the best one was chosen by using the trace option.
+```{r}
+
+forecast::auto.arima(fl_ts, trace = TRUE)
+```
+
+Third, extend the model out 14 days, making a forecast. 
+Then look at the standard plot to visually inspect the forecast.
+```{r}
+
+fl_forecast <- forecast::forecast(fl_model, h=14)
+
+plot(fl_forecast) # simple plot
+```
+
+Fourth, turn the model object into a table, known as a data frame object, so it can be plotted or exported.
+```{r}
+fl_df <- fortify(fl_model) 
+
+head(fl_df) # look at the first few rows. The Index column references days. 1 is the first day.
+
+# You could look at the full data frame if you were in R using View().
+# View(fl_df)
+```
+
+### Check the Fit
+Plot observed and fitted values next to each other.
+```{r}
+ggplot(fl_df, aes(x = Index)) +    # you can create a "trunk" for everything that the following lines will share.
+                                   # Here they will all use the same data and the same x axis
+  geom_hline(yintercept = 0, 
+             color      = "grey") +
+  geom_line(aes(y     = Fitted, 
+                color = "Model (fitted)"), 
+            size = 1) +
+  geom_line(aes(y     = Data,  
+                color = "Observed"), 
+            size = 1) +
+  theme_minimal() + 
+  scale_color_manual(values = c("Observed"="#018571", 
+                                "Model (fitted)"="#80cdc1")) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Fitted and Observed Values",
+       x     = "Days",
+       y     = "Hospitalizations",
+       color = "")
+```
+
+Plot the residuals (AKA the errors).
+```{r}
+# Is there are discernable pattern? (No pattern = good)
+ggplot(fl_df, aes(x = Index, 
+                  y = Residuals)) +
+  geom_hline(yintercept = 0,  
+             alpha = .5) + # add a reference line for 0
+  geom_line()
+
+# Are they normally distributed? (Normally distributed = good)
+hist(fl_df$Residuals, n = 30)
+
+# Autocorrelation with time lags. Are they roundy? (Round clusters = good)
+lag.plot(fl_df$Residuals, lags =4)
+
+# Normal probability plot. (Hugging the line = good)
+qqnorm(fl_df$Residuals)
+qqline(fl_df$Residuals)
+
+```
+
+
+Keep in mind: **"All models are wrong; some are better than others."**
+Could we produce a better fit manually? Unlikely.
+Could we try a data transformation? Absolutely!
+Here is what it would look like if we applied a natural log transformation.
+
+```{r}
+fl_ts_log <- ts(log(filter(data, county == "STATEWIDE")$hosp))
+fl_df_log <- fortify(forecast::auto.arima(fl_ts_log))
+
+# exponentiate data and fitted values
+fl_df_log[2:3] <- exp(fl_df_log[2:3])
+
+# Examine the residuals
+# Is there are discernable pattern? (No pattern = good)
+ggplot(fl_df_log, aes(x = Index, y = Residuals)) +
+  geom_hline(yintercept = 0, alpha = .5) + # add a reference line for 0
+  geom_line()
+
+# Are they normally distributed? (Normally distributed = good)
+hist(fl_df_log$Residuals, n = 30)
+
+# Autocorrelation with time lags. Are they roundy? (Round clusters = good)
+lag.plot(fl_df_log$Residuals, lags =4)
+
+# Normal probability plot. (Hugging the line = good)
+qqnorm(fl_df_log$Residuals)
+qqline(fl_df_log$Residuals)
+
+
+```
+
+Overall, this looks better, but it is still not perfect.
+We could play aroud with a sine transformation, but that is not the purpose of this demonstration.
+So, moving on...
+
+***
+
+
+### Unique Models by County
+Simultaneously autofit a unique model for each county.
+
+First, create a function that will carry out all tasks for each county. 
+This function runs from the inside out.
+```{r}
+hosp_arima_fun <- function(df) {
+  fortify(                    # fifth, convert the forecast into a data frame
+    forecast::forecast(       # fourth, extend the model to a forecast
+      forecast::auto.arima(   # third, run an arima model (that automatically selects the correct fit)
+        ts(                   # second, convert to time series object
+          log(df$hosp))),     # first, extract the column
+      h=14),                  # number of days to forecast
+    ts.connect = F)           # we do not want the observed and forecast lines connected
+}
+```
+
+Second, nest the data by county, apply the function, then unnest the data.
+```{r}
+
+by_county <- data %>%
+  filter(county %in% c("MIAMI-DADE", 
+                       "BROWARD", 
+                       "PALM BEACH", 
+                       "HILLSBOROUGH", 
+                       "ORANGE", 
+                       "LEE",
+                       "MANATEE", 
+                       "PINELLAS",
+                       "LEON")) %>%
+  group_by(county) %>%
+  nest() %>%
+  mutate(data2 = map(data, hosp_arima_fun)) %>%
+  unnest(cols = data2) %>%
+  select(-data)
+
+# exponentiate the logged data, don't worry about bias-adjustment because they don't need to sum to the statewide totals.
+by_county[3:9] <- exp(by_county[3:9])
+
+# make a date column, index column, and put into a data frame that will receive the ts() data
+dates <- seq(from = start_date, to = (max(county_data$date)+days(14)), by = 1)
+index <- seq(from = 1, to = length(dates), by = 1)
+dates_df <- data.frame(dates, index) 
+names(dates_df) <- c("date", "Index")
+by_county <- by_county %>%
+  left_join(dates_df)
+
+
+head(by_county) # look at the first few rows
+```
+
+Take a look at a few counties.
+```{r warning = FALSE, fig.width=10,fig.height=10}
+
+# filter data and make points for labeling
+plot_data <- by_county %>%
+  mutate(label = case_when(date == max(dates)            ~ (`Point Forecast`),
+                           date == max(county_data$date) ~ as.double(Data)
+                           ))
+
+# plot
+ggplot(plot_data, 
+       aes(x     = date, 
+           group = county)) +
+  geom_line(aes(y     = Data, 
+                color = "Observed"), 
+            size = 1) +
+  geom_ribbon(aes(ymin = `Lo 95`, 
+                  ymax = `Hi 95`, 
+                  fill = "CI"), 
+              alpha = .5, 
+              show.legend = FALSE) +
+  geom_line(aes(y = `Point Forecast`, 
+                color = "Forecast"), 
+            size = 1) +
+  geom_hline(aes(y = Data),
+             yintercept = 0, 
+             color = "grey") +
+  facet_wrap(vars(county), 
+             ncol = 3, 
+             scales = "free") +
+  scale_color_manual(name = "", 
+                     values = c("Observed" = "#018571", 
+                                "Forecast" = "#a6611a")) + 
+  scale_fill_manual(values = c( "CI" = "#dfc27d")) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = "", 
+       y = "Hospitalizations", 
+       caption = "Important: Note the free axes.") +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = NA, 
+                                       color = "grey"),
+        axis.text.x = element_text(angle = 90),
+        legend.position = "top",
+        plot.margin = margin(2, 2, 2, 2, "cm"),
+        plot.caption = element_text(size = 12)
+       )
+
+```
+
+
+### Export the Data
+To visualize the data in Tableau, write to SQL Server.
+```{r eval = FALSE}
+
+connection <- "odbc_connection_name"
+
+sqlSave(channel   = "odbc_connection_name",
+        dat       = select(by_county,
+                           county, 
+                           date, 
+                           Data,
+                           "Point Forecast",
+                           "Lo 95", 
+                           "Hi 95"),
+        tablename = "hosp_forecast_demo",
+        safer     = FALSE,
+        rownames  = FALSE)
+
+# Or you can save as a csv
+write.csv(select(by_county,
+                 county, 
+                 date, 
+                 Data,
+                 "Point Forecast",
+                 "Lo 95", 
+                 "Hi 95"),
+          "path/filename.csv",
+          na = "")
+
+
+```
