@@ -1,4 +1,5 @@
-# Make polygon plot from mus and sigmas
+# Make polygon plot to compare the mus and sigmas for two variables among 
+## various groups
 
 # Set up -----------------------------------------------------------------------
 library(tidyverse)
