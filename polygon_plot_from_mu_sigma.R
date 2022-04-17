@@ -1,5 +1,6 @@
 # Make polygon plot to compare the mus and sigmas for two variables among 
 ## various groups
+## with extensive comments for Woody
 
 # Set up -----------------------------------------------------------------------
 library(tidyverse)
