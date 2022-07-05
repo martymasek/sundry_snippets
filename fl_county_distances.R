@@ -143,7 +143,7 @@ ggplot(data = final_map_df,
   theme(legend.title = element_blank()) 
 
 ## Save the map
-ggsave(path = "C:/Users/heyma/OneDrive - Florida State University/Projects/Put On GitHub",
+ggsave(path = "",
        filename = "county_access_map.png",
        device = "png",
        dpi = 300,
