@@ -8,10 +8,12 @@
 ## to and subtracted from the respective mu.)
 
 # Set up -----------------------------------------------------------------------
-library(tidyverse)
+library(dplyr)
+library(ggplot)
 
 # Data -------------------------------------------------------------------------
 # Create example data with random values
+set.seed(345)
 example_df <- data.frame(g = c("group 1", "group 2", "group 3", "group 4"),
                          x_mu = sample(5:10, 4, replace = FALSE),
                          y_mu = sample(5:10, 4, replace = FALSE),

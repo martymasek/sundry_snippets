@@ -1,8 +1,7 @@
 Sundry Snippets
 ================
 
-Here you’ll find useful bits of (mostly) R code. Feel free to use what
-is helpful.
+Here you’ll find useful bits of (mostly) R code.
 
 <br> <br>
 
@@ -19,7 +18,9 @@ code
 
 ## 5-year age group crosswalk
 
-example of first 20 rows, code
+example of first 15 rows shown below
+
+code
 [here](https://github.com/martymasek/sundry_snippets/blob/main/create_age_group_xwalk.R)
 
 | age | age_group_5yr |
@@ -39,8 +40,14 @@ example of first 20 rows, code
 |  12 | 10-14         |
 |  13 | 10-14         |
 |  14 | 10-14         |
-|  15 | 15-19         |
-|  16 | 15-19         |
-|  17 | 15-19         |
-|  18 | 15-19         |
-|  19 | 15-19         |
+
+<br> <br>
+
+## Tree plot from h2o model
+
+outputs a ggplot object
+
+code
+[here](https://github.com/martymasek/sundry_snippets/blob/main/plot_h2o_tree.R)
+
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->

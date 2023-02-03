@@ -1,8 +1,9 @@
 # function to plot trees from h2o model ----
 ## requires tidyverse to be loaded, h2o to be running, igraph to be installed (no need to load)
 if (!require(igraph)) install.packages('igraph')
-if (!require(dplyr)) install.packages('dplyr')
-if (!require(ggplot2)) install.packages('ggplot2')
+if (!require(tidyverse)) install.packages('tidyverse')
+# if (!require(h2o)) install.packages('h2o')
+library(tidyverse)
 
 plot_h2o_tree <- function(model, 
                           tree_number, 
