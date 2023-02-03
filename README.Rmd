@@ -1,0 +1,38 @@
+---
+title: "Sundry Snippets"
+output: github_document
+---
+
+Here you'll find useful bits of (mostly) R code.
+Feel free to use what is helpful.
+
+<br>
+<br>
+
+Some examples:
+
+## Population pyramid plotting
+code [here](https://github.com/martymasek/sundry_snippets/blob/main/population_pyramid_function.R)
+
+```{r popn_pyramid, echo=FALSE, message=FALSE, warning=FALSE}
+source(here::here("population_pyramid_function.R"))
+
+# use function to make plot with example data
+popn_pyramid(df = test_data,
+             ageCol = age,
+             sexCol = sex)
+```
+
+<br>
+<br>
+
+## 5-year age group crosswalk
+example of first 20 rows, code [here](https://github.com/martymasek/sundry_snippets/blob/main/create_age_group_xwalk.R)
+
+```{r echo=FALSE}
+source(here::here("create_age_group_xwalk.R"))
+age_xwalk |>
+  head(20) |>
+  knitr::kable()
+```
+
