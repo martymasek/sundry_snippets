@@ -4,7 +4,12 @@ if (!require(igraph)) install.packages('igraph')
 if (!require(tidyverse)) install.packages('tidyverse')
 # if (!require(h2o)) install.packages('h2o')
 library(tidyverse)
+library(h2o)
 
+# start h2o
+h2o.init(max_mem_size = "4g")
+
+# function 
 plot_h2o_tree <- function(model, 
                           tree_number, 
                           label_length = 25, 
@@ -140,3 +145,35 @@ plot_h2o_tree <- function(model,
   return(plot)
   
 }
+
+# Use function in example
+
+## Example data
+set.seed(789)
+example_df <- data.frame(
+  y = factor(sample(0:1, 50, replace = TRUE)),
+  x1 = factor(c(rep("A", 20), rep("B", 20), rep("C", 10))),
+  x2   = rnorm(n = 50, mean = 0, sd = 1),
+  x3   = sample(x = 1:5,  replace = TRUE, prob = c(.1,.2,.3,.4,.1)),
+  x4   = sample(x = 6:10, replace = TRUE, prob = c(.1,.2,.3,.4,.1))
+) |>
+  as.h2o()
+
+# run simple model
+xgb <- h2o.xgboost(y = "y",
+                   x = paste0("x", 1:4),
+                   training_frame = example_df,
+                   max_depth = 6
+)
+
+# use plot function
+plot_h2o_tree(model = xgb,
+              tree_number = 1)
+
+# save plot
+ggsave(filename = 'h2o_tree_plot.png',
+       path = 'output/plots',
+       device = 'png')
+
+# shutdown h2o
+h2o.shutdown()

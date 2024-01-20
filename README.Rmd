@@ -4,34 +4,38 @@ output: github_document
 ---
 
 Here you'll find useful bits of (mostly) R code.
-
-<br>
-<br>
-
 Some examples:
 
-## Population pyramid plotting
-code [here](https://github.com/martymasek/sundry_snippets/blob/main/population_pyramid_function.R)
+## Population pyramid plot function
+Find the code [here](https://github.com/martymasek/sundry_snippets/blob/main/code/population_pyramid_function.R).
 
 ```{r popn_pyramid, echo=FALSE, message=FALSE, warning=FALSE}
-source(here::here("population_pyramid_function.R"))
+knitr::include_graphics(here::here("output/plots/popn_pyramid.png"))
+```
 
-# use function to make plot with example data
-popn_pyramid(df = test_data,
-             ageCol = age,
-             sexCol = sex)
+<br>
+<br>
+
+## Sunrise and Sunset Times
+Gets data from the U.S. Navy's API for one year in different locations.
+Here is a plot of two locations.
+
+Find the code [here](https://github.com/martymasek/sundry_snippets/blob/main/code/sun_rise_set_times.R).
+
+```{r echo=FALSE}
+knitr::include_graphics(here::here("output/plots/sun_rise_set.png"))
 ```
 
 <br>
 <br>
 
 ## 5-year age group crosswalk
-example of first 15 rows shown below
+Example of first 15 rows shown below.
 
-code [here](https://github.com/martymasek/sundry_snippets/blob/main/create_age_group_xwalk.R)
+Find the code [here](https://github.com/martymasek/sundry_snippets/blob/main/code/create_age_group_xwalk.R).
 
 ```{r echo=FALSE}
-source(here::here("create_age_group_xwalk.R"))
+source(here::here("code/create_age_group_xwalk.R"))
 age_xwalk |>
   head(15) |>
   knitr::kable()
@@ -41,41 +45,10 @@ age_xwalk |>
 <br>
 
 ## Tree plot from h2o model
-outputs a ggplot object
+Outputs a ggplot object.
 
-code [here](https://github.com/martymasek/sundry_snippets/blob/main/plot_h2o_tree.R)
+Find the code [here](https://github.com/martymasek/sundry_snippets/blob/main/code/plot_h2o_tree.R).
 
-```{r include=FALSE}
-library(h2o)
-
-h2o.init(max_mem_size = "4g")
-
-set.seed(789)
-example_df <- data.frame(y = factor(sample(0:1, 50, replace = TRUE)),
-                         x1 = factor(c(rep("A", 20), rep("B", 20), rep("C", 10))),
-                         x2   = rnorm(n = 50, mean = 0, sd = 1),
-                         x3   = sample(x = 1:5,  replace = TRUE, prob = c(.1,.2,.3,.4,.1)),
-                         x4   = sample(x = 6:10, replace = TRUE, prob = c(.1,.2,.3,.4,.1))
-) |>
-  as.h2o()
-
-xgb <- h2o.xgboost(y = "y",
-            x = paste0("x", 1:4),
-            training_frame = example_df,
-            max_depth = 6
-            )
-
-source(here::here("plot_h2o_tree.R"))
+```{r echo=FALSE}
+knitr::include_graphics(here::here("output/plots/h2o_tree_plot.png"))
 ```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-
-plot_h2o_tree(model = xgb,
-              tree_number = 1)
-```
-
-```{r include=FALSE}
-h2o.shutdown()
-```
-

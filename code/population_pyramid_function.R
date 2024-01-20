@@ -51,3 +51,8 @@ popn_pyramid <- function(df,
 popn_pyramid(df = test_data,
              ageCol = age,
              sexCol = sex)
+
+# save plot
+ggsave(filename = 'popn_pyramid.png',
+       path = 'output/plots',
+       device = 'png')

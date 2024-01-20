@@ -1,27 +1,35 @@
 Sundry Snippets
 ================
 
-Here you’ll find useful bits of (mostly) R code.
+Here you’ll find useful bits of (mostly) R code. Some examples:
+
+## Population pyramid plot function
+
+Find the code
+[here](https://github.com/martymasek/sundry_snippets/blob/main/code/population_pyramid_function.R).
+
+<img src="output/plots/popn_pyramid.png" width="2558" />
 
 <br> <br>
 
-Some examples:
+## Sunrise and Sunset Times
 
-## Population pyramid plotting
+Gets data from the U.S. Navy’s API for one year in different locations.
+Here is a plot of two locations.
 
-code
-[here](https://github.com/martymasek/sundry_snippets/blob/main/population_pyramid_function.R)
+Find the code
+[here](https://github.com/martymasek/sundry_snippets/blob/main/code/sun_rise_set_times.R).
 
-![](README_files/figure-gfm/popn_pyramid-1.png)<!-- -->
+<img src="output/plots/sun_rise_set.png" width="2558" />
 
 <br> <br>
 
 ## 5-year age group crosswalk
 
-example of first 15 rows shown below
+Example of first 15 rows shown below.
 
-code
-[here](https://github.com/martymasek/sundry_snippets/blob/main/create_age_group_xwalk.R)
+Find the code
+[here](https://github.com/martymasek/sundry_snippets/blob/main/code/create_age_group_xwalk.R).
 
 | age | age_group_5yr |
 |----:|:--------------|
@@ -45,9 +53,9 @@ code
 
 ## Tree plot from h2o model
 
-outputs a ggplot object
+Outputs a ggplot object.
 
-code
-[here](https://github.com/martymasek/sundry_snippets/blob/main/plot_h2o_tree.R)
+Find the code
+[here](https://github.com/martymasek/sundry_snippets/blob/main/code/plot_h2o_tree.R).
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+<img src="output/plots/h2o_tree_plot.png" width="2558" />
