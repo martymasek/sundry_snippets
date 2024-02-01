@@ -31,10 +31,6 @@ This one is for a county in Washington State.
 Find the code
 [here](https://github.com/martymasek/sundry_snippets/blob/main/code/precinct_votes_map.R)
 
-``` r
-knitr::include_graphics(here::here("output/plots/precinct_votes_map.png"))
-```
-
 <img src="output/plots/precinct_votes_map.png" width="2662" />
 
 <br> <br>
