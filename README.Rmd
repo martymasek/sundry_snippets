@@ -29,6 +29,18 @@ knitr::include_graphics(here::here("output/plots/sun_rise_set.png"))
 <br>
 <br>
 
+## Voter Precinct Map with Historical Voting Data
+This one is for a county in Washington State.
+
+Find the code [here](https://github.com/martymasek/sundry_snippets/blob/main/code/precinct_votes_map.R)
+
+```{r}
+knitr::include_graphics(here::here("output/plots/precinct_votes_map.png"))
+```
+
+<br>
+<br>
+
 ## 5-year age group crosswalk
 Example of first 15 rows shown below.
 
