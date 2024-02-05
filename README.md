@@ -3,12 +3,12 @@ Sundry Snippets
 
 Here you’ll find useful bits of (mostly) R code. Some examples:
 
-## Population pyramid plot function
+## Voter Precinct Map with Historical Voting Data
 
 Find the code
-[here](https://github.com/martymasek/sundry_snippets/blob/main/code/population_pyramid_function.R).
+[here](https://github.com/martymasek/sundry_snippets/blob/main/code/precinct_votes_map.R).
 
-<img src="output/plots/popn_pyramid.png" width="2558" />
+<img src="output/plots/precinct_votes_map_thurston.png" width="2662" />
 
 <br> <br>
 
@@ -24,14 +24,12 @@ Find the code
 
 <br> <br>
 
-## Voter Precinct Map with Historical Voting Data
-
-This one is for a county in Washington State.
+## Population pyramid plot function
 
 Find the code
-[here](https://github.com/martymasek/sundry_snippets/blob/main/code/precinct_votes_map.R)
+[here](https://github.com/martymasek/sundry_snippets/blob/main/code/population_pyramid_function.R).
 
-<img src="output/plots/precinct_votes_map.png" width="2662" />
+<img src="output/plots/popn_pyramid.png" width="2558" />
 
 <br> <br>
 

@@ -6,11 +6,12 @@ output: github_document
 Here you'll find useful bits of (mostly) R code.
 Some examples:
 
-## Population pyramid plot function
-Find the code [here](https://github.com/martymasek/sundry_snippets/blob/main/code/population_pyramid_function.R).
+## Voter Precinct Map with Historical Voting Data
 
-```{r popn_pyramid, echo=FALSE, message=FALSE, warning=FALSE}
-knitr::include_graphics(here::here("output/plots/popn_pyramid.png"))
+Find the code [here](https://github.com/martymasek/sundry_snippets/blob/main/code/precinct_votes_map.R).
+
+```{r echo=FALSE}
+knitr::include_graphics(here::here("output/plots/precinct_votes_map_thurston.png"))
 ```
 
 <br>
@@ -29,13 +30,11 @@ knitr::include_graphics(here::here("output/plots/sun_rise_set.png"))
 <br>
 <br>
 
-## Voter Precinct Map with Historical Voting Data
-This one is for a county in Washington State.
+## Population pyramid plot function
+Find the code [here](https://github.com/martymasek/sundry_snippets/blob/main/code/population_pyramid_function.R).
 
-Find the code [here](https://github.com/martymasek/sundry_snippets/blob/main/code/precinct_votes_map.R)
-
-```{r echo=FALSE}
-knitr::include_graphics(here::here("output/plots/precinct_votes_map.png"))
+```{r popn_pyramid, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::include_graphics(here::here("output/plots/popn_pyramid.png"))
 ```
 
 <br>
