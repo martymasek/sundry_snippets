@@ -3,6 +3,15 @@ Sundry Snippets
 
 Here you’ll find useful bits of (mostly) R code. Some examples:
 
+## Population pyramid plot function
+
+Find the code
+[here](https://github.com/martymasek/sundry_snippets/blob/main/code/population_pyramid_function.R).
+
+<img src="output/plots/popn_pyramid.png" width="2558" />
+
+<br> <br>
+
 ## Voter Precinct Map with Historical Voting Data
 
 Find the code
@@ -21,15 +30,6 @@ Find the code
 [here](https://github.com/martymasek/sundry_snippets/blob/main/code/sun_rise_set_times.R).
 
 <img src="output/plots/sun_rise_set.png" width="2558" />
-
-<br> <br>
-
-## Population pyramid plot function
-
-Find the code
-[here](https://github.com/martymasek/sundry_snippets/blob/main/code/population_pyramid_function.R).
-
-<img src="output/plots/popn_pyramid.png" width="2558" />
 
 <br> <br>
 
