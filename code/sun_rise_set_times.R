@@ -52,11 +52,14 @@ sun_df_wide = sun_df |>
 
 # Define values for pretty plotting --------------------------------------------
 
-x_breaks <- c(glue('{year(date_vec[1])}-01-01'),
-              glue('{year(date_vec[1])}-04-01'),
-              glue('{year(date_vec[1])}-07-01'),
-              glue('{year(date_vec[1])}-10-01'),
-              glue('{year(date_vec[1])}-12-31'))
+x_breaks <- paste0(year(date_vec[1]), 
+                   '-', 
+                   c('01',
+                     '04',
+                     '07',
+                     '10',
+                     '12'),
+                   '-01')
 x_labels <- c('Jan','Apr','Jul','Oct','Jan')
 y_time_breaks <- c('00:00:00','06:00:00','12:00:00','18:00:00','23:59:59')
 y_breaks <- c(as.POSIXct(paste(as.Date(sun_df$dtm[1]), y_time_breaks)))
@@ -64,18 +67,21 @@ y_labels <- c('12 AM','6 AM', '12 PM', '6 PM', '12 AM')
 
 # Plot -------------------------------------------------------------------------
 
+# sun rise and set as different lines
 sun_df_wide |>
   # reduce the number of lines on the plot
-  filter(names(place) %in% c('Tallahassee','Sacramento')) |>
+  filter(names(place) %in% c('Tallahassee', 'Camas')) |>
   ggplot(aes(x = date,
              group = place,
              color = place)) +
   geom_line(aes(y = Rise),
-            linewidth = 1.5,
-            alpha = .3) +
+            # linewidth = 1.5,
+            #alpha = .3
+            ) +
   geom_line(aes(y = Set),
-            linewidth = 1.5,
-            alpha = .3) +
+            # linewidth = 1.5,
+            #alpha = .3
+            ) +
   scale_x_date(name = '\nMonth',
                breaks = as.Date(x_breaks),
                labels = x_labels) +
@@ -87,6 +93,8 @@ sun_df_wide |>
                        breaks = unlist(place_list),
                        labels = names(place_list)) +
   labs(title = 'Sun Rise and Set Times\n') +
+  geom_vline(xintercept = as.Date(paste0(year(date_vec[1]),substr(Sys.Date(), 5, 10))),
+             color = "light gray") +
   theme(panel.background = element_rect(fill = NA, color = 'grey'),
         panel.grid = element_blank(),
         panel.grid.major.y = element_line(color = 'grey', linetype = 'dashed'),
@@ -96,5 +104,36 @@ sun_df_wide |>
 ggsave(filename = 'sun_rise_set.png',
        path = 'output/plots',
        device = 'png')
+
+
+# light time
+sun_df_wide |>
+  mutate(light_hours = as.integer(difftime(Set, Rise, units = "mins"))/60) |>
+  ggplot(aes(x = date,
+             y = light_hours,
+             group = place,
+             color = place)) +
+  geom_vline(xintercept = as.Date(paste0(year(date_vec[1]),substr(Sys.Date(), 5, 10))),
+             color = "light gray") +
+  geom_line() +
+  scale_x_date(name = '\nMonth',
+               breaks = as.Date(x_breaks),
+               labels = x_labels) +
+  scale_color_discrete(name = 'Place',
+                       breaks = unlist(place_list),
+                       labels = names(place_list)) +
+  scale_y_continuous(name = "Hours of Light\n",
+                     # breaks = seq(8,16,2),
+                     limits = c(0,16)) +
+  theme(panel.background = element_rect(fill = NA, color = 'grey'),
+        panel.grid = element_blank(),
+        panel.grid.major.y = element_line(color = 'grey', linetype = 'dashed'),
+        plot.title.position = 'plot') +
+  annotate(x = as.Date(paste0(year(date_vec[1]),substr(Sys.Date(), 5, 10))),
+           y = 7,
+           geom = "label",
+           label = "Today",
+           color = "dark gray")
+  
 
 # Done -------------------------------------------------------------------------
